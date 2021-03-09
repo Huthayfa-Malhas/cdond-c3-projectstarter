@@ -55,7 +55,7 @@ jobs:
       - slack/notify:
           channel: 'C01QWD1V6R2'
           event: pass
-          template: basic_success_1
+          template: basic_fail_1
 
   build-backend:
     docker:
@@ -119,7 +119,7 @@ jobs:
       - slack/notify:
           channel: 'C01QWD1V6R2'
           event: pass
-          template: basic_success_1
+          template: basic_fail_1
 
   scan-backend:
     docker:
