@@ -52,6 +52,10 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - slack/notify:
+          channel: 'C01QWD1V6R2'
+          event: pass
+          template: basic_success_1
 
   build-backend:
     docker:
@@ -113,6 +117,7 @@ jobs:
             npm i
             npm audit fix --audit-level=critical --force
       - slack/notify:
+          channel: 'C01QWD1V6R2'
           event: pass
           template: basic_success_1
 
