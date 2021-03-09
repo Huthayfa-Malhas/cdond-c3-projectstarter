@@ -78,6 +78,7 @@ jobs:
           name: Test front-end
           command: |
             cd frontend
+            npm i
             npm run test
                 
   test-backend:
@@ -91,6 +92,7 @@ jobs:
           name: Back-end test
           command: |
             cd backend
+            npm i
             npm run test
 
 workflows:
