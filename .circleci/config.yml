@@ -52,9 +52,6 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - slack/notify:
-          event: pass
-          template: success_tagged_deploy_1
 
   build-backend:
     docker:
@@ -115,9 +112,6 @@ jobs:
             cd frontend
             npm i
             npm audit fix --audit-level=critical --force
-      - slack/notify:
-          event: pass
-          template: success_tagged_deploy_1
 
   scan-backend:
     docker:
@@ -131,7 +125,7 @@ jobs:
           command: |
             cd backend
             npm i
-            npm audit --audit-level=critical
+            npm audit fix --audit-level=critical --force
       - slack/notify:
           event: fail
           template: basic_fail_1
