@@ -147,7 +147,6 @@ jobs:
               --tags project=udapeople-backend-kk1j2z7dhjxxmz437 \
                --stack-name "backend-stack-kk1j2z7dhjxxmz437" \
                --parameter-overrides ID="kk1j2z7dhjxxmz437"
-
       - run:
           name: cache BACKEND_IP_ADDRESS
           command: |
@@ -157,7 +156,6 @@ jobs:
               --output text)
             echo $BACKEND_IP_ADDRESS
             curl -H "Content-Type: text/plain" -H "token: kk1j2z7dhjxxmz437" --request PUT --data "$BACKEND_IP_ADDRESS" https://api.memstash.io/values/kk1j2z7dhjxxmz437
-
       - run:
           name: Ensure front-end infrastructure exist
           command: |
