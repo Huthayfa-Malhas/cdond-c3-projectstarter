@@ -145,8 +145,18 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople-backend-kk1j2z7dhjxxmz437 \
-              --stack-name "backend-stack-kk1j2z7dhjxxmz437" \
-              --parameter-overrides ID="kk1j2z7dhjxxmz437"
+               --stack-name "backend-stack-kk1j2z7dhjxxmz437" \
+               --parameter-overrides ID="kk1j2z7dhjxxmz437"
+
+      - run:
+          name: cache BACKEND_IP_ADDRESS
+          command: |
+            BACKEND_IP_ADDRESS=$(aws ec2 describe-instances \
+              --filter "Name=tag:project,Values=udapeople-backend-kk1j2z7dhjxxmz437" \
+              --query "Reservations[*].Instances[*].[PublicIpAddress]" \
+              --output text)
+            echo $BACKEND_IP_ADDRESS
+            curl -H "Content-Type: text/plain" -H "token: kk1j2z7dhjxxmz437" --request PUT --data "$BACKEND_IP_ADDRESS" https://api.memstash.io/values/kk1j2z7dhjxxmz437
 
       - run:
           name: Ensure front-end infrastructure exist
@@ -159,12 +169,9 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            BACKEND_IP_ADDRESS=$(aws ec2 describe-instances \
-              --filter "Name=tag:project,Values=udapeople-backend-kk1j2z7dhjxxmz437" \
-              --query "Reservations[*].Instances[*].[PublicIpAddress]" \
-              --output text)
+            BACKEBACKEND_IP_ADDRESSND_IP=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
             echo $BACKEND_IP_ADDRESS
-            echo $BACKEND_IP >> .circleci/ansible/inventory.txt
+            echo $BACKEND_IP_ADDRESS >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
