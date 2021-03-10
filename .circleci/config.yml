@@ -7,14 +7,18 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+      workflowId:
+        type: string
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            # Your code here
-            exit 1
+            aws s3 rm s3://udapeople-<< parameters.workflowId >>--recursive
+            aws cloudformation delete-stack \
+              --stack-name "frontend-stack-<< parameters.workflowId >>"
+            aws cloudformation delete-stack \
+              --stack-name "backend-stack-<< parameters.workflowId >>"
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -130,6 +134,45 @@ jobs:
           event: fail
           template: basic_fail_1
 
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli:2.0.6
+    steps:
+      - checkout
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople-backend-kk1j2z7dhjxxmz437 \
+               --stack-name "backend-stack-kk1j2z7dhjxxmz437 \
+               --parameter-overrides ID="kk1j2z7dhjxxmz437"
+
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople-frontend-kk1j2z7dhjxxmz437 \
+                --stack-name "frontend-stack-kk1j2z7dhjxxmz437" \
+                --parameter-overrides ID="kk1j2z7dhjxxmz437"
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            BACKEND_IP_ADDRESS=$(aws ec2 describe-instances \
+              --filter "Name=tag:project,Values=udapeople-backend-kk1j2z7dhjxxmz437" \
+              --query "Reservations[*].Instances[*].[PublicIpAddress]" \
+              --output text)
+            echo $BACKEND_IP_ADDRESS
+            echo $BACKEND_IP >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      - destroy-environment:
+          workflowId: "kk1j2z7dhjxxmz437"
+
 workflows:
   default:
     jobs:
@@ -143,3 +186,8 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch]
