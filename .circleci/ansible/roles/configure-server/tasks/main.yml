@@ -1,0 +1,31 @@
+- name: "update packages"
+  become: yes
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: "Install NodeJS"
+  become: yes
+  apt:
+    name: nodejs
+    state: latest
+    update_cache: yes
+
+- name: "Install npm"
+  become: yes
+  apt:
+    name: npm
+    state: latest
+    update_cache: yes    
+
+- name: "Install pm2"
+  become: yes
+  npm:
+    name: pm2
+    state: latest
+    global: yes
+
+- name: "startup pm2"
+  become: yes
+  shell: env PATH=$PATH:/usr/local/bin pm2 startup
