@@ -167,7 +167,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            BACKEBACKEND_IP_ADDRESSND_IP=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
+            BACKEND_IP_ADDRESS=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
             echo $BACKEND_IP_ADDRESS
             echo $BACKEND_IP_ADDRESS >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
