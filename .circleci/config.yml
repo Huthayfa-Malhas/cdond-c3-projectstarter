@@ -173,6 +173,7 @@ jobs:
             echo $BACKEND_IP_ADDRESS
             echo $BACKEND_IP_ADDRESS >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
+      - run: yum install -y tar gzip
       - persist_to_workspace:
           root: ~/
           paths:
