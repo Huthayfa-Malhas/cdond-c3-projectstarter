@@ -1,0 +1,35 @@
+- name: Create backend app
+  become: yes
+  file:
+    path: /home/ubuntu/backend
+    state: directory
+
+- name: "Copy backend dist"
+  become: yes
+  unarchive:
+    src: /tmp/workspace/backend.tar.gz
+    dest: /home/ubuntu/backend/
+    owner: ubuntu
+
+- name: "Copy package.json to server"
+  become: yes
+  copy:
+    src: /tmp/workspace/package.json
+    dest: /home/ubuntu/backend/
+    owner: ubuntu
+
+- name: "Install NPM dependencies"
+  shell:
+    cmd: npm install --production
+    chdir: /home/ubuntu/app
+
+- name: "Start backend with pm2"
+  become: yes
+  shell: |
+    export TYPEORM_HOST="{{ lookup('env', 'TYPEORM_HOST') }}"
+    export TYPEORM_ENTITIES="{{ lookup('env', 'TYPEORM_ENTITIES') }}"
+    export TYPEORM_USERNAME="{{ lookup('env', 'TYPEORM_USERNAME') }}"
+    export TYPEORM_PASSWORD="{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+    export TYPEORM_DATABASE="{{ lookup('env', 'TYPEORM_DATABASE') }}"
+    cd /home/ubuntu/backend
+    pm2 start --name "backend" npm -- start
