@@ -285,7 +285,7 @@ jobs:
 workflows:
   default:
     jobs:
-      - deploy-backend:
+      - deploy-backend
 #       - build-frontend
 #       - build-backend
 #       - deploy-infrastructure:
