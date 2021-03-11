@@ -250,12 +250,12 @@ jobs:
             BACKEND_IP=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
+            cd frontend
+            npm i
+            npm run build
       - run:
           name: Deploy frontend objects
           command: |
-            cd frontend
-            npm i
-            npm run build  
             aws s3 cp ./dist s3://udapeople-kk1j2z7dhjxxmz437 --recursive
       - destroy-environment:
           workflowId: "kk1j2z7dhjxxmz437"   
