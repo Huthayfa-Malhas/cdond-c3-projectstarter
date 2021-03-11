@@ -14,30 +14,29 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws s3 rm s3://udapeople-<< parameters.workflowId >>--recursive
-            aws cloudformation delete-stack \
-              --stack-name "frontend-stack-<< parameters.workflowId >>"
-            aws cloudformation delete-stack \
-              --stack-name "backend-stack-<< parameters.workflowId >>"
+            aws s3 rm s3://udapeople-<< parameters.workflowId >> --recursive
+            aws cloudformation delete-stack --stack-name "frontend-stack-<< parameters.workflowId >>"
+            aws cloudformation delete-stack --stack-name "backend-stack-<< parameters.workflowId >>"
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
-      # Add parameter here     
+      workflowId:
+        type: string  
     steps:
       - run:
           name: Revert migrations
           # Add when this will run
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS=$(curl -H "token: migration_<< parameters.workflowId >>" --request GET https://api.memstash.io/values/migration_<< parameters.workflowId >>)
+            echo $SUCCESS
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+            cd ~/project/backend
+            npm install
+            npm run migrations:revert
             fi
+
             
 jobs:
   build-frontend:
@@ -308,10 +307,12 @@ jobs:
             then
             return 1
             else
-            return 0
+            return 1
             fi
       - destroy-environment:
           workflowId: "kk1j2z7dhjxxmz437"
+      - revert-migration:
+          workflowId: "${CIRCLE_WORKFLOW_ID}"
 
 workflows:
   default:
