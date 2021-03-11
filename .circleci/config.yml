@@ -314,6 +314,28 @@ jobs:
       - revert-migration:
           workflowId: "${CIRCLE_WORKFLOW_ID}"
 
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli:2.0.6
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
+            yum install -y nodejs
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+                --stack-name "udapeoplecloudfront" \
+                --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          workflowId: "kk1j2z7dhjxxmz437"
+      - revert-migration:
+          workflowId: "${CIRCLE_WORKFLOW_ID}"
+
 workflows:
   default:
     jobs:
@@ -331,3 +353,5 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
+#       - cloudfront-update:
+#           requires: [smoke-test]
