@@ -7,7 +7,7 @@
 - name: "Copy backend dist"
   become: yes
   unarchive:
-    src: /tmp/workspace/backend.tar.gz
+    src: ~/backend.tar.gz
     dest: /home/ubuntu/backend/
     owner: ubuntu
 
