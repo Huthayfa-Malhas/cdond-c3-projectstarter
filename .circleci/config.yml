@@ -26,7 +26,7 @@ commands:
     steps:
       - run:
           name: Revert migrations
-          # Add when this will run
+          when: on_fail
           command: |
             SUCCESS=$(curl -H "token: migration_<< parameters.workflowId >>" --request GET https://api.memstash.io/values/migration_<< parameters.workflowId >>)
             echo $SUCCESS
@@ -154,7 +154,7 @@ jobs:
               --query "Reservations[*].Instances[*].[PublicIpAddress]" \
               --output text)
             echo $BACKEND_IP_ADDRESS
-            curl -H "Content-Type: text/plain" -H "token: kk1j2z7dhjxxmz437" --request PUT --data "$BACKEND_IP_ADDRESS" https://api.memstash.io/values/kk1j2z7dhjxxmz437
+            curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request PUT --data "$BACKEND_IP_ADDRESS" https://api.memstash.io/values/${CIRCLE_WORKFLOW_ID}
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -166,7 +166,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            BACKEND_IP_ADDRESS=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
+            BACKEND_IP_ADDRESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/${CIRCLE_WORKFLOW_ID})
             echo $BACKEND_IP_ADDRESS
             echo $BACKEND_IP_ADDRESS >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
@@ -246,7 +246,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            BACKEND_IP=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
+            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/${CIRCLE_WORKFLOW_ID})
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             cd frontend
@@ -296,7 +296,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            BACKEND_IP=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
+            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/${CIRCLE_WORKFLOW_ID})
             echo $BACKEND_IP
             curl -s http://$BACKEND_IP:3030/api/status
       - run:
