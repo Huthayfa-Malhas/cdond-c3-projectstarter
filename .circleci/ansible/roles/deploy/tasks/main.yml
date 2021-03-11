@@ -7,21 +7,14 @@
 - name: "Copy backend dist"
   become: yes
   unarchive:
-    src: ~/backend.tar.gz
+    src: ~/project/backend.tar.gz
     dest: /home/ubuntu/backend/
     owner: ubuntu
 
-- name: "Copy package.json to server"
+- name: "installing dependencies"
   become: yes
-  copy:
-    src: /tmp/workspace/package.json
-    dest: /home/ubuntu/backend/
-    owner: ubuntu
-
-- name: "Install NPM dependencies"
-  shell:
-    cmd: npm install --production
-    chdir: /home/ubuntu/app
+  npm:
+    path: /home/ubuntu/backend
 
 - name: "Start backend with pm2"
   become: yes
@@ -33,3 +26,4 @@
     export TYPEORM_DATABASE="{{ lookup('env', 'TYPEORM_DATABASE') }}"
     cd /home/ubuntu/backend
     pm2 start --name "backend" npm -- start
+  
