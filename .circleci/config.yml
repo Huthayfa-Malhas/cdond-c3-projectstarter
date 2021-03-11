@@ -232,6 +232,33 @@ jobs:
       - destroy-environment:
           workflowId: "kk1j2z7dhjxxmz437"
 
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli:2.0.6
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_IP=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm i
+            npm run build  
+            aws s3 cp ./dist s3://udapeople-kk1j2z7dhjxxmz437 --recursive
+      - destroy-environment:
+          workflowId: "kk1j2z7dhjxxmz437"   
+
 workflows:
   default:
     jobs:
@@ -243,3 +270,5 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
