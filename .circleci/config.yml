@@ -278,6 +278,7 @@ jobs:
           name: Deploy backend
           command: |
             cat .circleci/ansible/inventory.txt
+            tar -zcvf backend.tar.gz backend
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
       - destroy-environment:
           workflowId: "kk1j2z7dhjxxmz437"
