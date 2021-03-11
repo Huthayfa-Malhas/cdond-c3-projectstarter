@@ -286,8 +286,10 @@ workflows:
   default:
     jobs:
       - build-backend
-      - deploy-backend:
+      - configure-infrastructure:
           requires: [build-backend]
+      - deploy-backend:
+          requires: [configure-infrastructure]
 #       - build-frontend
 #       - build-backend
 #       - deploy-infrastructure:
