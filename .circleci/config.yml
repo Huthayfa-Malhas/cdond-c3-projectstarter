@@ -144,13 +144,13 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople-backend-kk1j2z7dhjxxmz437 \
-               --stack-name "backend-stack-kk1j2z7dhjxxmz437" \
+               --stack-name "backend-stack-${CIRCLE_WORKFLOW_ID:0:4}" \
                --parameter-overrides ID="kk1j2z7dhjxxmz437"
       - run:
           name: cache BACKEND_IP_ADDRESS
           command: |
             BACKEND_IP_ADDRESS=$(aws ec2 describe-instances \
-              --filter "Name=tag:project,Values=udapeople-backend-kk1j2z7dhjxxmz437" \
+              --filter "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:4}" \
               --query "Reservations[*].Instances[*].[PublicIpAddress]" \
               --output text)
             echo $BACKEND_IP_ADDRESS
