@@ -1,14 +1,8 @@
-- name: Create backend app
-  become: yes
-  file:
-    path: /home/ubuntu/backend
-    state: directory
-
 - name: "Copy backend dist"
   become: yes
   unarchive:
     src: ~/project/backend.tar.gz
-    dest: /home/ubuntu/backend/
+    dest: /home/ubuntu/
     owner: ubuntu
 
 - name: "installing dependencies"
