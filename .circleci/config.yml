@@ -283,25 +283,50 @@ jobs:
       - destroy-environment:
           workflowId: "kk1j2z7dhjxxmz437"
 
+  smoke-test:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl python3 py3-pip
+            pip3 install --upgrade pip
+            pip3 install awscli
+      - run:
+          name: Backend smoke test.
+          command: |
+            BACKEND_IP=$(curl -H "token: kk1j2z7dhjxxmz437" --request GET https://api.memstash.io/values/kk1j2z7dhjxxmz437)
+            echo $BACKEND_IP
+            curl -s http://$BACKEND_IP:3030/api/status
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID}.s3-website-us-west-2.amazonaws.com"
+            if curl -s ${URL} | grep "Welcome"
+            then
+            return 1
+            else
+            return 1
+            fi
+      - destroy-environment:
+          workflowId: "kk1j2z7dhjxxmz437"
+
 workflows:
   default:
     jobs:
+      - build-frontend
       - build-backend
       - deploy-infrastructure:
-          requires: [build-backend]
+          requires: [build-frontend, build-backend]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      - deploy-backend:
+      - run-migrations:
           requires: [configure-infrastructure]
-#       - build-frontend
-#       - build-backend
-#       - deploy-infrastructure:
-#           requires: [build-frontend, build-backend]
-#       - configure-infrastructure:
-#           requires: [deploy-infrastructure]
-#       - run-migrations:
-#           requires: [configure-infrastructure]
-#       - deploy-frontend:
-#           requires: [run-migrations]
-#       - deploy-backend:
-#           requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
