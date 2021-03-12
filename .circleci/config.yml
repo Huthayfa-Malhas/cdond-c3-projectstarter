@@ -150,7 +150,7 @@ jobs:
           name: cache BACKEND_IP_ADDRESS
           command: |
             BACKEND_IP_ADDRESS=$(aws ec2 describe-instances \
-              --filter "Name=tag:project,Values=udapeople-backend-xyxyxyxyxyxyxyxyx" \
+              --filter "Name=tag:project,Values=udapeople-backend-xyxyxyxyxyxyxyxyx" "Name=instance-state-name,Values=running" \
               --query "Reservations[*].Instances[*].[PublicIpAddress]" \
               --output text)
             echo $BACKEND_IP_ADDRESS
