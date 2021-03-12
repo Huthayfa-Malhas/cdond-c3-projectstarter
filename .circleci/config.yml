@@ -143,30 +143,30 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=udapeople-backend-xyxyxyxyxyxyxyxyx \
-               --stack-name "backend-stack-xyxyxyxyxyxyxyxyx" \
-               --parameter-overrides ID="xyxyxyxyxyxyxyxyx"
+              --tags project=udapeople-backend-xyxyxyxyxyxyxyxyxy \
+               --stack-name "backend-stack-xyxyxyxyxyxyxyxyxy" \
+               --parameter-overrides ID="xyxyxyxyxyxyxyxyxy"
       - run:
           name: cache BACKEND_IP_ADDRESS
           command: |
             BACKEND_IP_ADDRESS=$(aws ec2 describe-instances \
-              --filter "Name=tag:project,Values=udapeople-backend-xyxyxyxyxyxyxyxyx" "Name=instance-state-name,Values=running" \
+              --filter "Name=tag:project,Values=udapeople-backend-xyxyxyxyxyxyxyxyxy" "Name=instance-state-name,Values=running" \
               --query "Reservations[*].Instances[*].[PublicIpAddress]" \
               --output text)
             echo $BACKEND_IP_ADDRESS
-            curl -H "Content-Type: text/plain" -H "token: xyxyxyxyxyxyxyxyx" --request PUT --data "$BACKEND_IP_ADDRESS" https://api.memstash.io/values/xyxyxyxyxyxyxyxyx
+            curl -H "Content-Type: text/plain" -H "token: xyxyxyxyxyxyxyxyxy" --request PUT --data "$BACKEND_IP_ADDRESS" https://api.memstash.io/values/xyxyxyxyxyxyxyxyxy
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople-frontend-xyxyxyxyxyxyxyxyx \
-                --stack-name "frontend-stack-xyxyxyxyxyxyxyxyx" \
-                --parameter-overrides ID="xyxyxyxyxyxyxyxyx"
+              --tags project=udapeople-frontend-xyxyxyxyxyxyxyxyxy \
+                --stack-name "frontend-stack-xyxyxyxyxyxyxyxyxy" \
+                --parameter-overrides ID="xyxyxyxyxyxyxyxyxy"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            BACKEND_IP_ADDRESS=$(curl -H "token: xyxyxyxyxyxyxyxyx" --request GET https://api.memstash.io/values/xyxyxyxyxyxyxyxyx)
+            BACKEND_IP_ADDRESS=$(curl -H "token: xyxyxyxyxyxyxyxyxy" --request GET https://api.memstash.io/values/xyxyxyxyxyxyxyxyxy)
             echo $BACKEND_IP_ADDRESS
             echo $BACKEND_IP_ADDRESS >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
@@ -175,8 +175,8 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment:
-          workflowId: "xyxyxyxyxyxyxyxyx"
+#       - destroy-environment:
+#           workflowId: "xyxyxyxyxyxyxyxyxy"
 
   configure-infrastructure:
     docker:
@@ -201,7 +201,7 @@ jobs:
               cat .circleci/ansible/inventory.txt
               ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment:
-          workflowId: "xyxyxyxyxyxyxyxyx"
+          workflowId: "xyxyxyxyxyxyxyxyxy"
 
   run-migrations:
     docker:
@@ -227,9 +227,9 @@ jobs:
             MEMSTASH_DATA=0
             fi 
             echo $MEMSTASH_DATA
-            curl -H "Content-Type: text/plain" -H "token: migration_xyxyxyxyxyxyxyxyx" --request PUT --data "$MEMSTASH_DATA" https://api.memstash.io/values/migration_xyxyxyxyxyxyxyxyx
+            curl -H "Content-Type: text/plain" -H "token: migration_xyxyxyxyxyxyxyxyxy" --request PUT --data "$MEMSTASH_DATA" https://api.memstash.io/values/migration_xyxyxyxyxyxyxyxyxy
       - destroy-environment:
-          workflowId: "xyxyxyxyxyxyxyxyx"
+          workflowId: "xyxyxyxyxyxyxyxyxy"
 
   deploy-frontend:
     docker:
@@ -246,15 +246,15 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            BACKEND_IP=$(curl -H "token: xyxyxyxyxyxyxyxyx" --request GET https://api.memstash.io/values/xyxyxyxyxyxyxyxyx)
+            BACKEND_IP=$(curl -H "token: xyxyxyxyxyxyxyxyxy" --request GET https://api.memstash.io/values/xyxyxyxyxyxyxyxyxy)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             cd frontend
             npm i
             npm run build
-            aws s3 cp ./dist s3://udapeople-xyxyxyxyxyxyxyxyx --recursive
+            aws s3 cp ./dist s3://udapeople-xyxyxyxyxyxyxyxyxy --recursive
       - destroy-environment:
-          workflowId: "xyxyxyxyxyxyxyxyx"
+          workflowId: "xyxyxyxyxyxyxyxyxy"
 
   deploy-backend:
     docker:
@@ -296,13 +296,13 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            BACKEND_IP=$(curl -H "token: xyxyxyxyxyxyxyxyx" --request GET https://api.memstash.io/values/xyxyxyxyxyxyxyxyx)
+            BACKEND_IP=$(curl -H "token: xyxyxyxyxyxyxyxyxy" --request GET https://api.memstash.io/values/xyxyxyxyxyxyxyxyxy)
             echo $BACKEND_IP
             curl -s http://$BACKEND_IP:3030/api/status
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-xyxyxyxyxyxyxyxyx.s3-website-us-west-2.amazonaws.com"
+            URL="http://udapeople-xyxyxyxyxyxyxyxyxy.s3-website-us-west-2.amazonaws.com"
             if curl -s ${URL} | grep "Welcome"
             then
             return 0
@@ -310,9 +310,9 @@ jobs:
             return 1
             fi
       - destroy-environment:
-          workflowId: "xyxyxyxyxyxyxyxyx"
+          workflowId: "xyxyxyxyxyxyxyxyxy"
       - revert-migration:
-          workflowId: "xyxyxyxyxyxyxyxyx"
+          workflowId: "xyxyxyxyxyxyxyxyxy"
 
   cloudfront-update:
     docker:
@@ -330,7 +330,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
                 --stack-name "udapeople-production" \
-                --parameter-overrides WorkflowID="xyxyxyxyxyxyxyxyx"
+                --parameter-overrides WorkflowID="xyxyxyxyxyxyxyxyxy"
 
 workflows:
   default:
