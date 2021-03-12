@@ -314,24 +314,49 @@ jobs:
       - revert-migration:
           workflowId: "xyxyxyxyxyxyxyxyxy"
 
-  cloudfront-update:
+#   cloudfront-update:
+#     docker:
+#       - image: amazon/aws-cli:2.0.6
+#     steps:
+#       - checkout
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
+#             yum install -y nodejs
+#       - run:
+#           name: Update cloudfront distribution
+#           command: |
+#             aws cloudformation deploy \
+#               --template-file .circleci/files/cloudfront.yml \
+#                 --stack-name "udapeople-cloudfront" \
+#                 --parameter-overrides WorkflowID="fa99d66f-c550-4079-9179-c6610ca89296"
+  cleanup:
     docker:
       - image: amazon/aws-cli:2.0.6
     steps:
       - checkout
       - run:
-          name: Install dependencies
+          name: Cleanup
           command: |
-            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-            yum install -y nodejs
-      - run:
-          name: Update cloudfront distribution
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/cloudfront.yml \
-                --stack-name "udapeople-cloudfront" \
-                --parameter-overrides WorkflowID="fa99d66f-c550-4079-9179-c6610ca89296"
-
+              export OldWorkflowID=$(aws cloudformation \
+                  list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                  --no-paginate --output text)
+              export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                  --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+              echo $OldWorkflowID
+              echo ${STACKS[*]}
+              aws cloudformation deploy \
+                --template-file .circleci/files/cloudfront.yml \
+                  --stack-name "udapeople-cloudfront" \
+                  --parameter-overrides WorkflowID="fa99d66f-c550-4079-9179-c6610ca89296"
+              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+              then
+                # your code here
+                aws cloudformation delete-stack --stack-name "backend-stack-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "frontend-stack-${OldWorkflowID}" 
+                aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive                           
+              fi
 workflows:
   default:
     jobs:
@@ -349,4 +374,5 @@ workflows:
 #           requires: [run-migrations]
 #       - smoke-test:
 #           requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update
+#       - cloudfront-update
+      - cleanup
