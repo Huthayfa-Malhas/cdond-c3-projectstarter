@@ -330,23 +330,23 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
                 --stack-name "udapeople-production" \
-                --parameter-overrides WorkflowID="xyxyxyxyxyxyxyxyxy"
+                --parameter-overrides WorkflowID="fa99d66f-c550-4079-9179-c6610ca89296"
 
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - deploy-infrastructure:
-          requires: [build-frontend, build-backend]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
-#       - cloudfront-update
+#       - build-frontend
+#       - build-backend
+#       - deploy-infrastructure:
+#           requires: [build-frontend, build-backend]
+#       - configure-infrastructure:
+#           requires: [deploy-infrastructure]
+#       - run-migrations:
+#           requires: [configure-infrastructure]
+#       - deploy-frontend:
+#           requires: [run-migrations]
+#       - deploy-backend:
+#           requires: [run-migrations]
+#       - smoke-test:
+#           requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update
